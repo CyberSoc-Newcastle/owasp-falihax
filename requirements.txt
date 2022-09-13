@@ -1,0 +1,4 @@
+# This file specifies which Python packages are required to run the app
+# You shouldn't need to change anything here unless you want to use a new package/library
+
+Flask>=2.2.2
