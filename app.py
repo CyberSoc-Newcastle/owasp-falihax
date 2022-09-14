@@ -32,7 +32,7 @@ def add_to_navbar(name: str):
 @app.route("/")
 @add_to_navbar("Home")
 def homepage():
-    return render_template("base.html", title="Homepage")
+    return render_template("home.html", title="Homepage")
 
 
 if __name__ == '__main__':

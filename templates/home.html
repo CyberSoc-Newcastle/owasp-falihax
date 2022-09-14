@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="carousel" class="carousel carousel-light slide" data-bs-ride="carousel">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active" data-bs-interval="6000">
+      <img src="{{ url_for('static', filename='card.png') }}" height="400" class="d-block w-100" style="object-fit:cover">
+      <div class="container">
+        <div class="carousel-caption text-start">
+          <h1>Try our new credit cards</h1>
+          <p>You could get a response in 0.3 seconds. Up to £5 credit limit, 7000% APR Representative (variable).</p>
+          <p><a class="btn btn-lg btn-primary" href="#" onclick="alert('no')">Check your eligibility</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="6000">
+      <img src="{{ url_for('static', filename='atm.jpg') }}" height="400" class="d-block w-100" style="object-fit:cover">
+      <div class="container">
+        <div class="carousel-caption text-start">
+          <h1>New PIN numbers now available</h1>
+          <p>Including 5, 3, and for our business customers, 9.</p>
+          {# TODO: make this button do something #}
+          <p><a class="btn btn-lg btn-primary" href="#">Log in</a></p>
+        </div>
+      </div>
+    </div>
+    <div class="carousel-item" data-bs-interval="6000">
+      <img src="{{ url_for('static', filename='key.jpg') }}" height="400" class="d-block w-100" style="object-fit:cover">
+      <div class="container">
+        <div class="carousel-caption text-start">
+          <h1>Security Guarantee</h1>
+          <p>We've been keeping your personal data kind of secure since 2022.</p>
+          {# TODO: make this button do something #}
+          <p><a class="btn btn-lg btn-primary" href="#">Log in</a></p>
+        </div>
+      </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+{% endblock %}

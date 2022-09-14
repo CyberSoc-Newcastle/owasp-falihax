@@ -1,0 +1,23 @@
+/*
+ * Some additional CSS for the page design.
+ * You don't need to change anything in this file.
+ */
+
+a.cybot{
+    opacity:0.5;
+    position:absolute;
+    bottom:0;
+    left: 5%;
+}
+
+a.cybot > img{
+    height:35px;
+}
+
+a.cybot:hover{
+    opacity: 1;
+}
+
+footer{
+    position: relative;
+}

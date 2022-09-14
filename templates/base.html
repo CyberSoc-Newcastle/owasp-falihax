@@ -1,37 +1,58 @@
-<html>
-<head>
-    <title>
-        {#- Add a title to the page if one was specified, otherwise default -#}
-        {%- if title is defined -%}
-        {{ title }} - {{ company_name -}}
-        {%- else -%}
-        {{ company_name -}}
-        {%- endif -%}
-    </title>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            {#- Add a title to the page if one was specified, otherwise default -#}
+            {%- if title is defined -%}
+            {{ title }} - {{ company_name -}}
+            {%- else -%}
+            {{ company_name -}}
+            {%- endif -%}
+        </title>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"/>
-    <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
 
-</head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color:#fcc">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">
-            <img src="{{ url_for('static', filename='falihax.png') }}" height="72"/>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                {% for name, view in navbar_page_names.items() -%}
-                <a class="nav-link{%- if request.path == url_for(view.__name__) %} active{% endif %}" href="{{ url_for(view.__name__) }}">{{ name }}</a>
-                {%- endfor %}
+        <!-- Bootstrap -->
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap.min.css') }}"/>
+        <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#fcc">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('homepage') }}">
+                    <img src="{{ url_for('static', filename='falihax.png') }}" height="72"/>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        {% for name, view in navbar_page_names.items() -%}
+                        <a class="nav-link{%- if request.path == url_for(view.__name__) %} active{% endif %}" href="{{ url_for(view.__name__) }}">{{ name }}</a>
+                        {%- endfor %}
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</nav>
-</body>
+        </nav>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <footer class="footer mt-auto py-3 bg-light">
+            <a class="cybot" href="https://cybersoc.org.uk/?r=falihax" title="A CyberSoc Workshop">
+                <img src="{{ url_for('static', filename='cybot.png') }}" alt="CyBot"/>
+            </a>
+            <div class="container text-center">
+                <small class="text-muted d-block">
+                    Regulated by the <a href="#" onclick="alert('not really')">FCA</a> (Ficticious Conduct Authority).
+                </small>
+                <small class="text-muted d-block">
+                    Obviously not a real bank. Don't put any personal information into this website.
+                </small>
+            </div>
+        </footer>
+    </body>
 </html>
