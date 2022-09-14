@@ -1,0 +1,39 @@
+-- auto-generated definition
+create table users
+(
+    username TEXT not null
+        constraint primary_key
+            primary key,
+    password INTEGER,
+    fullname TEXT not null
+);
+-- auto-generated definition
+create table bank_accounts
+(
+    username       TEXT       not null
+        constraint username_fk
+            references users,
+    sort_code      varchar(8) not null,
+    account_number varchar(8) not null,
+    account_name   TEXT       not null,
+    constraint bank_accounts_pk
+        primary key (sort_code, account_number)
+);
+
+-- auto-generated definition
+create table transactions
+(
+    id                  INTEGER    not null
+        constraint primary_key
+            primary key autoincrement,
+    timestamp           timestamp default CURRENT_TIMESTAMP not null,
+    from_sort_code      varchar(8),
+    from_account_number varchar(8),
+    to_sort_code        varchar(8) not null,
+    to_account_number   varchar(8) not null,
+    amount              INTEGER    not null,
+    constraint bank_accounts_fk
+        foreign key (from_sort_code, from_account_number, to_sort_code, to_account_number) references bank_accounts (sort_code, account_number, sort_code, account_number)
+);
+
+
