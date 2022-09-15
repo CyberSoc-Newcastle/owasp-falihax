@@ -2,3 +2,4 @@
 # You shouldn't need to change anything here unless you want to use a new package/library
 
 Flask>=2.2.2
+Flask-Login>=0.6.2

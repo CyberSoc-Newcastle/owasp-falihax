@@ -4,7 +4,7 @@ create table users
     username TEXT not null
         constraint primary_key
             primary key,
-    password INTEGER,
+    password TEXT,
     fullname TEXT not null
 );
 -- auto-generated definition
