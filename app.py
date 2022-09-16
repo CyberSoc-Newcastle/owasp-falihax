@@ -106,6 +106,12 @@ def login():
     return 'Login failed'
 
 
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    return 'Logged out'
+
+
 if __name__ == '__main__':
     # run this code on app start
     login_manager.init_app(app)
