@@ -242,6 +242,37 @@ def maketransaction():
     return redirect(url_for('homepage'))
 
 
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    if request.method == 'GET':
+        return '''
+                   <form action='admin' method='POST'>
+                   <input type='text' name='username' id='username' placeholder='username'/>
+                    <input type='text' name='score' id='score' placeholder='credit score'/>
+                    <input type='submit' name='submit'/>
+                   </form>
+                   '''
+
+    username = request.form['username']
+    score = request.form['score']
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    row = cursor.fetchone()
+    connection.close()
+    if row is None:
+        return 'User does not exist'
+
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("update users set credit_score = " + str(score) + " where username = \"" + username + "\"")
+    connection.commit()
+    connection.close()
+    return redirect(url_for('homepage'))
+
+
 if __name__ == '__main__':
     # run this code on app start
     login_manager.init_app(app)
