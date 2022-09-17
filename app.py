@@ -112,6 +112,41 @@ def logout():
     return 'Logged out'
 
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'GET':
+        return '''
+                   <form action='signup' method='POST'>
+                   <input type='text' name='fullname' id='fullname' placeholder='full name'/>
+                    <input type='text' name='username' id='username' placeholder='username'/>
+                    <input type='password' name='password' id='password' placeholder='password'/>
+                    <input type='submit' name='submit'/>
+                   </form>
+                   '''
+    username = request.form['username']
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    row = cursor.fetchone()
+    connection.close()
+
+    if row is not None:
+        return "An account with this username already exists"
+
+    password = request.form['password']
+    fullname = request.form['fullname']
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("insert into users (username, password, fullname) values (\"" + str(username) + "\", \""
+                   + str(password) + "\", \"" + str(fullname) + "\")")
+    connection.commit()
+    connection.close()
+    return redirect(url_for('login'))
+
+
+
 if __name__ == '__main__':
     # run this code on app start
     login_manager.init_app(app)
