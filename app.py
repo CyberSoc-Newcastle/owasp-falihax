@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from codecs import encode
 import flask_login
 import sqlite3
+import random
 
 app = Flask(__name__)
 app.secret_key = 'hello'
@@ -145,6 +146,53 @@ def signup():
     connection.commit()
     connection.close()
     return redirect(url_for('login'))
+
+
+@app.route('/createaccount', methods=['GET', 'POST'])
+def createaccount():
+    if request.method == 'GET':
+        return '''
+                   <form action='createaccount' method='POST'>
+                     <label for="account">Choose an account:</label>
+                     <select id="account" name="account">
+                        <option value="Falihax Super Saver" selected>Falihax Super Saver</option>
+                        <option value="Falihax Credit Card">Falihax Credit Card</option>
+                        <option value="Falihax Help to Buy">Falihax Help to Buy</option>
+                        <option value="Falihax Current Account">Falihax Current Account</option>
+                        </select>
+                    <input type='submit' name='submit'/>
+                   </form>
+                   '''
+
+    account = request.form['account']
+    unique = False
+    while not unique:
+        sortnum1 = random.randrange(0, 100)
+        sortnum2 = random.randrange(0, 100)
+        sort = "06-" + str(sortnum1).zfill(2) + "-" + str(sortnum2).zfill(2)
+        accnum = random.randrange(0, 100000000)
+        acc = str(accnum).zfill(8)
+
+        connection = sqlite3.connect("falihax.db")
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        cursor.execute("select * from bank_accounts where sort_code = \"" + sort + "\" or account_number = \"" + acc +
+                       "\"")
+        row = cursor.fetchone()
+        connection.close()
+        if row is None:
+            unique = True
+
+    user = flask_login.current_user
+    username = user.id
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("insert into bank_accounts (username, sort_code, account_number, account_name) values (\""
+                   + str(username) + "\", \"" + str(sort) + "\", \"" + str(acc) + "\", \"" + str(account) + "\")")
+    connection.commit()
+    connection.close()
+    return redirect(url_for('homepage'))
 
 
 
