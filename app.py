@@ -195,6 +195,52 @@ def createaccount():
     return redirect(url_for('homepage'))
 
 
+@app.route('/maketransaction', methods=['GET', 'POST'])
+def maketransaction():
+    if request.method == 'GET':
+        return '''
+                   <form action='maketransaction' method='POST'>
+                   <input type='text' name='sortcode' id='sortcode' placeholder='sort code'/>
+                    <input type='text' name='accountnumber' id='accountnumber' placeholder='account number'/>
+                    <input type='text' name='amount' id='amount' placeholder='amount'/>
+                    <input type='submit' name='submit'/>
+                   </form>
+                   '''
+
+    sort = request.form['sortcode']
+    acc = request.form['accountnumber']
+    amount = int(request.form['amount'])
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("select * from bank_accounts where sort_code = \"" + sort + "\" and account_number = \"" + acc +
+                   "\"")
+    row = cursor.fetchone()
+    connection.close()
+    if row is None:
+        return 'Account does not exist'
+
+    user = flask_login.current_user
+    username = user.id
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("select sort_code, account_number from bank_accounts where username = \"" + username + "\"")
+    row = cursor.fetchone()
+    connection.close()
+    if row is None:
+        return 'You do not have an account'
+
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("insert into transactions (from_sort_code, from_account_number, to_sort_code, to_account_number, "
+                   "amount) values (\"" + row[0] + "\", \"" + row[1] + "\", \"" + str(sort) + "\", \"" + str(acc) +
+                   "\", \"" + str(amount) + "\")")
+    connection.commit()
+    connection.close()
+    return redirect(url_for('homepage'))
+
 
 if __name__ == '__main__':
     # run this code on app start
