@@ -273,6 +273,43 @@ def admin():
     return redirect(url_for('homepage'))
 
 
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    user = flask_login.current_user
+    username = user.id
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute("select sort_code, account_number from bank_accounts where username = \"" + str(username) + "\"")
+    rows = cursor.fetchall()
+    connection.close()
+    if rows is None:
+        return 'You do not have a bank account'
+
+    balances = ""
+    for row in rows:
+        sort = row[0]
+        acc = row[1]
+        connection = sqlite3.connect("falihax.db")
+        connection.row_factory = sqlite3.Row
+        cursor = connection.cursor()
+        cursor.execute("select sum(amount) from transactions where to_sort_code = \"" + sort +
+                       "\" and to_account_number = \"" + acc + "\"")
+        moneyin = cursor.fetchone()[0]
+        if moneyin is None:
+            moneyin = 0
+        cursor.execute("select sum(amount) from transactions where from_sort_code = \"" + sort +
+                       "\" and from_account_number = \"" + acc + "\"")
+        moneyout = cursor.fetchone()[0]
+        if moneyout is None:
+            moneyout = 0
+        connection.close()
+        total = int(moneyin) - int(moneyout)
+        balances = balances + "Sort Code:" + sort + " Account Number:" + acc + " Balance:" + str(total) + "\n"
+    return balances
+
+
+
 if __name__ == '__main__':
     # run this code on app start
     login_manager.init_app(app)
