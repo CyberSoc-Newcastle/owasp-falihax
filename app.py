@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from codecs import encode
 import flask_login
 import sqlite3
 
@@ -97,7 +98,7 @@ def login():
     password_row = cursor.fetchone()
     connection.close()
 
-    if password_row is not None and password_row[0] == request.form['password']:
+    if password_row is not None and password_row[0] == encode(request.form['password'], 'rot_13'):
         user = User()
         user.id = username
         flask_login.login_user(user)
@@ -140,7 +141,7 @@ def signup():
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
     cursor.execute("insert into users (username, password, fullname) values (\"" + str(username) + "\", \""
-                   + str(password) + "\", \"" + str(fullname) + "\")")
+                   + encode(str(password), 'rot_13') + "\", \"" + str(fullname) + "\")")
     connection.commit()
     connection.close()
     return redirect(url_for('login'))
