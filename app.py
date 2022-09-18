@@ -190,14 +190,14 @@ def signup():
     return redirect(url_for('login'))
 
 
-@app.route('/createaccount', methods=['GET', 'POST'])
-@add_to_navbar("Create Account", lambda: current_user.is_authenticated)
-def createaccount():
+@app.route('/open_account', methods=['GET', 'POST'])
+@add_to_navbar("Open an Account", lambda: current_user.is_authenticated)
+def openaccount():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='createaccount' method='POST'>
+                   <form action='open_account' method='POST'>
                      <label for="account">Choose an account:</label>
                      <select id="account" name="account">
                         <option value="Falihax Super Saver" selected>Falihax Super Saver</option>
