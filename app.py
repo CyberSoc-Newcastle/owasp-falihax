@@ -192,7 +192,7 @@ def signup():
 
 @app.route('/open_account', methods=['GET', 'POST'])
 @add_to_navbar("Open an Account", lambda: current_user.is_authenticated)
-def openaccount():
+def open_account():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
     if request.method == 'GET':
@@ -258,14 +258,14 @@ def openaccount():
     return redirect(url_for('homepage'))
 
 
-@app.route('/maketransaction', methods=['GET', 'POST'])
+@app.route('/make_transaction', methods=['GET', 'POST'])
 @add_to_navbar("Make Transaction", lambda: current_user.is_authenticated)
-def maketransaction():
+def make_transaction():
     """Used to make a transaction"""
     # Returns a transaction form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='maketransaction' method='POST'>
+                   <form action='make_transaction' method='POST'>
                    <input type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
                     <input type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
                     <input type='text' name='fromsortcode' id='fromsortcode' placeholder='from sort code'/>
