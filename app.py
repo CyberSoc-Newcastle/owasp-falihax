@@ -21,7 +21,7 @@ def user_loader(username):
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    cursor.execute("select * from users where username = \"" + str(username) + "\"")
     account = cursor.fetchone()
     connection.close()
     if not account:
@@ -39,7 +39,7 @@ def request_loader(request):
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    cursor.execute("select * from users where username = \"" + str(username) + "\"")
     account = cursor.fetchone()
     connection.close()
     if not account:
@@ -77,6 +77,16 @@ def add_to_navbar(name: str):
     return __inner
 
 
+def amount_format(amount: int) -> str:
+    """
+    A helper function to take a signed amount in pence and render as a string.
+    i.e. -15058 becomes "£150.58"
+    :param amount: the signed integer amount in pence
+    :return: the rendered amount string
+    """
+    return f"{'-' if amount < 0 else ''}£{(abs(amount) // 100):,}.{(abs(amount) % 100):02}"
+
+
 @app.route("/")
 @add_to_navbar("Home")
 def homepage():
@@ -103,7 +113,7 @@ def login():
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select password from users where username = \"" + str(username)+"\"")
+    cursor.execute("select password from users where username = \"" + str(username) + "\"")
     password_row = cursor.fetchone()
     connection.close()
 
@@ -149,7 +159,7 @@ def signup():
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    cursor.execute("select * from users where username = \"" + str(username) + "\"")
     row = cursor.fetchone()
     connection.close()
 
@@ -328,7 +338,7 @@ def admin():
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select * from users where username = \"" + str(username)+"\"")
+    cursor.execute("select * from users where username = \"" + str(username) + "\"")
     row = cursor.fetchone()
     connection.close()
 
@@ -401,10 +411,9 @@ def account():
         total = int(moneyin) - int(moneyout)
 
         # Adds details to return string
-        balances = balances + "Sort Code:" + sort + " Account Number:" + acc + " Balance:" + str(total) + "\n"
+        balances = balances + "Sort Code:" + sort + " Account Number:" + acc + " Balance:" + amount_format(total) + "\n"
 
     return balances
-
 
 
 if __name__ == '__main__':
