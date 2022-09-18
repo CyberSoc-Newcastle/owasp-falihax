@@ -94,6 +94,7 @@ def homepage():
 
 
 @app.route("/login", methods=['GET', 'POST'])
+@add_to_navbar("Login")
 def login():
     """Used to login a user"""
     # Returns a login form when the user navigates to the page
@@ -131,6 +132,7 @@ def login():
 
 
 @app.route('/logout')
+@add_to_navbar("Logout")
 def logout():
     """Used to log out a user"""
     # Logs out the current user
@@ -139,6 +141,7 @@ def logout():
 
 
 @app.route('/signup', methods=['GET', 'POST'])
+@add_to_navbar("Sign Up")
 def signup():
     """Used for creating a user account"""
     # Returns a sign up form when the user navigates to the page
@@ -184,6 +187,7 @@ def signup():
 
 
 @app.route('/createaccount', methods=['GET', 'POST'])
+@add_to_navbar("Create Account")
 def createaccount():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
@@ -251,6 +255,7 @@ def createaccount():
 
 
 @app.route('/maketransaction', methods=['GET', 'POST'])
+@add_to_navbar("Make Transaction")
 def maketransaction():
     """Used to make a transaction"""
     # Returns a transaction form when the user navigates to the page
@@ -318,6 +323,7 @@ def maketransaction():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
+@add_to_navbar("Admin")
 def admin():
     """Allows admins to adjust users' credit scores"""
     # Returns a credit score form when the user navigates to the page
@@ -359,6 +365,7 @@ def admin():
 
 
 @app.route('/account', methods=['GET', 'POST'])
+@add_to_navbar("Account")
 def account():
     """Allows the user to view the balances of their bank accounts"""
     # Retrieves the current user's username from the session
