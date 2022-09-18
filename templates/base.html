@@ -30,9 +30,11 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        {% for name, view in navbar_page_names.items() -%}
-                        <a class="nav-link{%- if request.path == url_for(view.__name__) %} active{% endif %}" href="{{ url_for(view.__name__) }}">{{ name }}</a>
-                        {%- endfor %}
+                        {% for name, page in navbar_page_names.items() -%}
+                        {%- if page["condition"]() -%}
+                        <a class="nav-link{%- if request.path == url_for(page['view'].__name__) %} active{% endif %}" href="{{ url_for(page['view'].__name__) }}">{{ name }}</a>
+                        {% endif %}
+                        {%- endfor -%}
                     </div>
                 </div>
             </div>

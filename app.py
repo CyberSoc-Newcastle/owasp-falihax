@@ -1,8 +1,12 @@
+from typing import Callable, Optional
+
 from flask import Flask, render_template, request, redirect, url_for
 from codecs import encode
 import flask_login
 import sqlite3
 import random
+
+from flask_login import current_user
 
 app = Flask(__name__)
 app.secret_key = 'hello'
@@ -64,14 +68,14 @@ def define_name_constants() -> dict:
                 navbar_page_names=navbar_page_names)
 
 
-def add_to_navbar(name: str):
+def add_to_navbar(name: str, condition: Optional[Callable[[], bool]] = None):
     """
     A decorator to add a page to the navbar. You don't need to edit this.
     """
 
     def __inner(f):
         global navbar_page_names
-        navbar_page_names[name] = f
+        navbar_page_names[name] = {"view": f, "condition": (condition if condition is not None else (lambda: True))}
         return f
 
     return __inner
@@ -94,7 +98,7 @@ def homepage():
 
 
 @app.route("/login", methods=['GET', 'POST'])
-@add_to_navbar("Login")
+@add_to_navbar("Login", lambda: not current_user.is_authenticated)
 def login():
     """Used to login a user"""
     # Returns a login form when the user navigates to the page
@@ -132,7 +136,7 @@ def login():
 
 
 @app.route('/logout')
-@add_to_navbar("Logout")
+@add_to_navbar("Logout", lambda: current_user.is_authenticated)
 def logout():
     """Used to log out a user"""
     # Logs out the current user
@@ -141,7 +145,7 @@ def logout():
 
 
 @app.route('/signup', methods=['GET', 'POST'])
-@add_to_navbar("Sign Up")
+@add_to_navbar("Sign Up", lambda: not current_user.is_authenticated)
 def signup():
     """Used for creating a user account"""
     # Returns a sign up form when the user navigates to the page
@@ -187,7 +191,7 @@ def signup():
 
 
 @app.route('/createaccount', methods=['GET', 'POST'])
-@add_to_navbar("Create Account")
+@add_to_navbar("Create Account", lambda: current_user.is_authenticated)
 def createaccount():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
@@ -255,7 +259,7 @@ def createaccount():
 
 
 @app.route('/maketransaction', methods=['GET', 'POST'])
-@add_to_navbar("Make Transaction")
+@add_to_navbar("Make Transaction", lambda: current_user.is_authenticated)
 def maketransaction():
     """Used to make a transaction"""
     # Returns a transaction form when the user navigates to the page
@@ -365,7 +369,7 @@ def admin():
 
 
 @app.route('/account', methods=['GET', 'POST'])
-@add_to_navbar("Account")
+@add_to_navbar("Account", lambda: current_user.is_authenticated)
 def account():
     """Allows the user to view the balances of their bank accounts"""
     # Retrieves the current user's username from the session
