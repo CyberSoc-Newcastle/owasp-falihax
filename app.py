@@ -255,7 +255,7 @@ def open_account():
     connection.close()
 
     # Redirects to homepage
-    return redirect(url_for('homepage'))
+    return redirect(url_for('account', sort_code=sort, account_number=acc))
 
 
 @app.route('/make_transaction', methods=['GET', 'POST'])
@@ -368,10 +368,10 @@ def admin():
     return redirect(url_for('homepage'))
 
 
-@app.route('/account', methods=['GET', 'POST'])
-@add_to_navbar("Account", lambda: current_user.is_authenticated)
-def account():
-    """Allows the user to view the balances of their bank accounts"""
+@app.route('/dashboard')
+@add_to_navbar("Dashboard", lambda: current_user.is_authenticated)
+def dashboard():
+    """Allows the user to view their accounts"""
     # Retrieves the current user's username from the session
     user = flask_login.current_user
     username = user.id
@@ -380,51 +380,92 @@ def account():
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select sort_code, account_number from bank_accounts where username = \"" + str(username) + "\"")
+    cursor.execute("select sort_code, account_number, account_name from bank_accounts where username = \"" + str(username) + "\"")
     rows = cursor.fetchall()
     connection.close()
 
+    accounts = []
+
     # If nothing is retrieved then the user does not have a bank account
-    if rows is None:
-        return 'You do not have a bank account'
+    if rows:
+        for row in rows:
+            # Retrieves sort code, account number and name
+            sort_code = row[0]
+            account_number = row[1]
+            name = row[2]
 
-    balances = ""
+            # Adds up all transactions sent to the bank account
+            connection = sqlite3.connect("falihax.db")
+            connection.row_factory = sqlite3.Row
+            cursor = connection.cursor()
+            cursor.execute(
+                f"SELECT"
+                f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE to_sort_code == '{sort_code}' AND to_account_number == '{account_number}')"
+                f"-"
+                f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE from_sort_code == '{sort_code}' AND from_account_number == '{account_number}')"
+                f"AS total;"
+            )
+            balance = amount_format(cursor.fetchone()[0])
+            connection.close()
 
-    # For each bank account retrieved
-    for row in rows:
-        # Retrieves sort code and account number
-        sort = row[0]
-        acc = row[1]
+            accounts.append({
+                "sort": sort_code,
+                "account": account_number,
+                "name": name,
+                "balance": balance
+            })
+    return render_template("dashboard.html", accounts=accounts)
 
-        # Adds up all transactions sent to the bank account
-        connection = sqlite3.connect("falihax.db")
-        connection.row_factory = sqlite3.Row
-        cursor = connection.cursor()
-        cursor.execute("select sum(amount) from transactions where to_sort_code = \"" + sort +
-                       "\" and to_account_number = \"" + acc + "\"")
-        moneyin = cursor.fetchone()[0]
 
-        # If no transactions are found then money in is 0
-        if moneyin is None:
-            moneyin = 0
+@app.route('/account/<sort_code>/<account_number>')
+def account(sort_code: str, account_number: str):
+    """Allows the user to view the statements for an account"""
+    # Retrieves the current user's username from the session
+    user = flask_login.current_user
+    username = user.id
 
-        # Adds up all transactions sent from the bank account
-        cursor.execute("select sum(amount) from transactions where from_sort_code = \"" + sort +
-                       "\" and from_account_number = \"" + acc + "\"")
-        moneyout = cursor.fetchone()[0]
+    # Attempts to retrieve any bank accounts that belong to the current user
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    cursor.execute(
+        f"select * from transactions where (to_account_number == \"{account_number}\" and to_sort_code == \"{sort_code}\") "
+        f"or (from_account_number == \"{account_number}\" and from_sort_code == \"{sort_code}\") order by timestamp desc;")
+    rows = cursor.fetchall()
+    cursor.execute(
+        f"SELECT"
+f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE to_sort_code == '{sort_code}' AND to_account_number == '{account_number}')"
+f"-"
+    f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE from_sort_code == '{sort_code}' AND from_account_number == '{account_number}')"
+    f"AS total;"
+    )
+    balance = amount_format(cursor.fetchone()[0])
+    connection.close()
 
-        # If no transactions are found then money out is 0
-        if moneyout is None:
-            moneyout = 0
-        connection.close()
+    transactions = []
 
-        # Works out total balance
-        total = int(moneyin) - int(moneyout)
+    # For each transaction
+    for table_row in rows:
+        row = list(table_row)  # make it mutable
+        # reverse the displayed amount if this wasn't incoming
+        display_account = row[3]
+        display_sort = row[2]
+        if not (row[4] == sort_code and row[5] == account_number):
+            row[6] *= -1
+            display_account = row[5]
+            display_sort = row[4]
+        # store transaction info
+        transactions.append({
+            "id": row[0],
+            "timestamp": row[1],
+            # a null sort code and account number means it was a cash deposit or withdrawal
+            "sort": (display_sort if display_sort else "CASH"),
+            "account": (display_account if display_account else "CASH"),
+            "amount": amount_format(row[6]),
+            "direction": ("in" if row[6] >= 0 else "out")
+        })
 
-        # Adds details to return string
-        balances = balances + "Sort Code:" + sort + " Account Number:" + acc + " Balance:" + amount_format(total) + "\n"
-
-    return balances
+    return render_template("account.html", transactions=transactions, balance=balance)
 
 
 if __name__ == '__main__':

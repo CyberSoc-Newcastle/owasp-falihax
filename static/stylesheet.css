@@ -21,3 +21,11 @@ a.cybot:hover{
 footer{
     position: relative;
 }
+
+td.in{
+    color: #0a0;
+}
+
+td.out{
+    color: #a00;
+}

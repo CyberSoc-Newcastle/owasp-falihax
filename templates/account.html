@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>
+                Transactions
+            </h1>
+            <p>
+                Balance: {{ balance }}
+            </p>
+            {%- if transactions -%}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Transaction ID</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Sort Code</th>
+                  <th scope="col">Account Number</th>
+                  <th scope="col">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for transaction in transactions -%}
+                <tr>
+                  <th scope="row">#{{ transaction["id"] }}</th>
+                  <td>{{ transaction["timestamp"] }}</td>
+                  <td>{{ transaction["sort"] }}</td>
+                  <td>{{ transaction["account"] }}</td>
+                  <td class="{{ transaction['direction'] }}">{{ transaction["amount"] }}</td>
+                </tr>
+                {%- endfor -%}
+              </tbody>
+            </table>
+            {%- else -%}
+            <p>There are no transactions to display.</p>
+            {%- endif -%}
+        </div>
+    </div>
+</div>
+{% endblock %}
