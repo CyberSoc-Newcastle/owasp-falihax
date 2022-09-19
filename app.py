@@ -252,6 +252,7 @@ def open_account():
     connection.close()
 
     # Redirects to homepage
+    flash('Account opened successfully.', 'success')
     return redirect(url_for('account', sort_code=sort, account_number=acc))
 
 
