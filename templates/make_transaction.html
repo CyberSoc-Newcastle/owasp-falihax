@@ -23,7 +23,7 @@
                 hidden_account_field.value = selected_account.dataset.account;
             }
         </script>
-        <form action='make_transaction' method='POST' class="col-12 col-lg-5">
+        <form method='POST' class="col-12 col-lg-5">
             <select id="from-accounts" class="form-select my-3" onchange="update_from_account()">
                 <option selected disabled>Choose an account to send money from...</option>
                 {%- for account in accounts -%}
