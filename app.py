@@ -181,6 +181,7 @@ def signup():
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
+    # encrypt the password with rot-13 cryptography
     cursor.execute("insert into users (username, password, fullname) values (\"" + str(username) + "\", \""
                    + encode(str(password), 'rot_13') + "\", \"" + str(fullname) + "\")")
     connection.commit()
