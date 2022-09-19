@@ -343,7 +343,8 @@ def admin():
 
     # If nothing is retrieved then the username is incorrect
     if row is None:
-        return 'User does not exist'
+        flash('User does not exist.', 'danger')
+        return render_template("admin.html")
 
     # Updates the user's credit score in the database
     connection = sqlite3.connect("falihax.db")
@@ -353,8 +354,8 @@ def admin():
     connection.commit()
     connection.close()
 
-    # Redirects to the homepage
-    return redirect(url_for('homepage'))
+    flash('Credit score set successfully.', 'success')
+    return render_template("admin.html")
 
 
 def get_accounts(username: str) -> List[Dict[str, str]]:
