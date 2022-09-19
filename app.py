@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Dict
 
 from flask import Flask, render_template, request, redirect, url_for
 from codecs import encode
@@ -368,19 +368,18 @@ def admin():
     return redirect(url_for('homepage'))
 
 
-@app.route('/dashboard')
-@add_to_navbar("Dashboard", lambda: current_user.is_authenticated)
-def dashboard():
-    """Allows the user to view their accounts"""
-    # Retrieves the current user's username from the session
-    user = flask_login.current_user
-    username = user.id
-
-    # Attempts to retrieve any bank accounts that belong to the current user
+def get_accounts(username: str) -> List[Dict[str, str]]:
+    """
+    A helper function to get a list of bank accounts for a particular username.
+    :param username: the username of the user
+    :return: a list of accounts
+    """
+    # Attempts to retrieve any bank accounts that belong to the user
     connection = sqlite3.connect("falihax.db")
     connection.row_factory = sqlite3.Row
     cursor = connection.cursor()
-    cursor.execute("select sort_code, account_number, account_name from bank_accounts where username = \"" + str(username) + "\"")
+    cursor.execute(
+        "select sort_code, account_number, account_name from bank_accounts where username = \"" + str(username) + "\"")
     rows = cursor.fetchall()
     connection.close()
 
@@ -414,7 +413,15 @@ def dashboard():
                 "name": name,
                 "balance": balance
             })
-    return render_template("dashboard.html", accounts=accounts)
+    return accounts
+
+
+@app.route('/dashboard')
+@add_to_navbar("Dashboard", lambda: current_user.is_authenticated)
+def dashboard():
+    """Allows the user to view their accounts"""
+    # Retrieves the current user's username from the session and gets their accounts
+    return render_template("dashboard.html", accounts=get_accounts(flask_login.current_user.id))
 
 
 @app.route('/account/<sort_code>/<account_number>')
