@@ -124,8 +124,9 @@ def login():
         user = User()
         user.id = username
         flask_login.login_user(user)
-        # Redirects to homepage
-        return redirect(url_for('homepage'))
+        # Redirects to dashboard
+        flash('Welcome!', 'primary')
+        return redirect(url_for('dashboard'))
 
     # Returns a failure message if the details are incorrect
     flash('Login failed.', 'danger')
