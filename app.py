@@ -327,13 +327,7 @@ def admin():
     """Allows admins to adjust users' credit scores"""
     # Returns a credit score form when the user navigates to the page
     if request.method == 'GET':
-        return '''
-                   <form method='POST'>
-                   <input type='text' name='username' id='username' placeholder='username'/>
-                    <input type='text' name='score' id='score' placeholder='credit score'/>
-                    <input type='submit' name='submit'/>
-                   </form>
-                   '''
+        return render_template("admin.html")
 
     # Retrieves the information from the form
     username = request.form['username']

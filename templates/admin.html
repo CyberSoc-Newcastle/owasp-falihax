@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5">Admin</h1>
+    <div class="row">
+        <h2>
+            Set Credit Score
+        </h2>
+        <form method='POST' class="col-12 col-lg-5">
+            <input class="form-control mb-3" type='text' name='username' id='username' placeholder='Username'/>
+            <input class="form-control mb-3" type='number' name='amount' id='amount' min="0" max="999" step="1" placeholder="Credit Score"/>
+            <input class="btn btn-danger mb-3" type='submit' name='submit'/>
+        </form>
+    </div>
+</div>
+{% endblock %}
