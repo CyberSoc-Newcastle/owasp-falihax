@@ -1,6 +1,6 @@
 from typing import Callable, Optional, List, Dict
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from codecs import encode
 import flask_login
 import sqlite3
@@ -285,7 +285,8 @@ def make_transaction():
 
     # If nothing is retrieved then the details are incorrect
     if row is None:
-        return 'Account does not exist'
+        flash('Recipient account details are incorrect.', 'danger')
+        return render_template("make_transaction.html", accounts=get_accounts(flask_login.current_user.id))
 
     # Retrieves the current user's username from the session
     user = flask_login.current_user
@@ -302,7 +303,8 @@ def make_transaction():
 
     # If nothing is retrieved then the details are incorrect
     if row is None:
-        return 'Your account details are invalid'
+        flash('"From" account details are incorrect.', 'danger')
+        return render_template("make_transaction.html", accounts=get_accounts(flask_login.current_user.id))
 
     # Inserts the transaction details into the database
     connection = sqlite3.connect("falihax.db")
@@ -314,8 +316,9 @@ def make_transaction():
     connection.commit()
     connection.close()
 
-    # Redirects to the homepage
-    return redirect(url_for('homepage'))
+    flash('Transaction complete.', 'success')
+    # Redirects to the transactions page
+    return redirect(url_for('account', sort_code=usersort, account_number=useracc))
 
 
 @app.route('/admin', methods=['GET', 'POST'])
