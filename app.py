@@ -104,7 +104,7 @@ def login():
     # Returns a login form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='login' method='POST'>
+                   <form method='POST'>
                     <input type='text' name='username' id='username' placeholder='username'/>
                     <input type='password' name='password' id='password' placeholder='password'/>
                     <input type='submit' name='submit'/>
@@ -151,7 +151,7 @@ def signup():
     # Returns a sign up form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='signup' method='POST'>
+                   <form method='POST'>
                    <input type='text' name='fullname' id='fullname' placeholder='full name'/>
                     <input type='text' name='username' id='username' placeholder='username'/>
                     <input type='password' name='password' id='password' placeholder='password'/>
@@ -197,7 +197,7 @@ def open_account():
     # Returns an account selection form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='open_account' method='POST'>
+                   <form method='POST'>
                      <label for="account">Choose an account:</label>
                      <select id="account" name="account">
                         <option value="Falihax Super Saver" selected>Falihax Super Saver</option>
@@ -265,7 +265,7 @@ def make_transaction():
     # Returns a transaction form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='make_transaction' method='POST'>
+                   <form method='POST'>
                    <input type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
                     <input type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
                     <input type='text' name='fromsortcode' id='fromsortcode' placeholder='from sort code'/>
@@ -333,7 +333,7 @@ def admin():
     # Returns a credit score form when the user navigates to the page
     if request.method == 'GET':
         return '''
-                   <form action='admin' method='POST'>
+                   <form method='POST'>
                    <input type='text' name='username' id='username' placeholder='username'/>
                     <input type='text' name='score' id='score' placeholder='credit score'/>
                     <input type='submit' name='submit'/>
