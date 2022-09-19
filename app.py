@@ -196,18 +196,15 @@ def open_account():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
     if request.method == 'GET':
-        return '''
-                   <form method='POST'>
-                     <label for="account">Choose an account:</label>
-                     <select id="account" name="account">
-                        <option value="Falihax Super Saver" selected>Falihax Super Saver</option>
-                        <option value="Falihax Credit Card">Falihax Credit Card</option>
-                        <option value="Falihax Help to Buy">Falihax Help to Buy</option>
-                        <option value="Falihax Current Account">Falihax Current Account</option>
-                        </select>
-                    <input type='submit' name='submit'/>
-                   </form>
-                   '''
+        company_name = define_name_constants()['company_name']
+        return render_template("open_account.html", account_names=[
+            f"{company_name} Super Saver",
+            f"{company_name} Credit Card",
+            f"{company_name} Help to Buy ISA",
+            f"{company_name} Current Account",
+            f"My First {company_name} Current Account (for children)",
+            f"My First {company_name} Pension Fund (for children)"
+        ])
 
     # Retrieves the account type from the form
     account = request.form['account']

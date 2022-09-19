@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="display-5">Open an Account</h1>
+    <div class="row">
+        <form method='POST' class="col-12 col-lg-5">
+            <select name="account" class="form-select my-3">
+                <option selected disabled>Choose an account...</option>
+                {%- for account_name in account_names -%}
+                <option value="{{ account_name }}">
+                    {{ account_name }}
+                </option>
+                {%- endfor -%}
+            </select>
+            <input class="btn btn-danger mb-3" type='submit' name='submit'/>
+        </form>
+    </div>
+</div>
+{% endblock %}
