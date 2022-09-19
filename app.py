@@ -68,14 +68,16 @@ def define_name_constants() -> dict:
                 navbar_page_names=navbar_page_names)
 
 
-def add_to_navbar(name: str, condition: Optional[Callable[[], bool]] = None):
+def add_to_navbar(name: str, side: Optional[str] = None, condition: Optional[Callable[[], bool]] = None):
     """
     A decorator to add a page to the navbar. You don't need to edit this.
     """
 
     def __inner(f):
         global navbar_page_names
-        navbar_page_names[name] = {"view": f, "condition": (condition if condition is not None else (lambda: True))}
+        navbar_page_names[name] = {"view": f,
+                                   "side": (side if side else "left"),
+                                   "condition": (condition if condition is not None else (lambda: True))}
         return f
 
     return __inner
@@ -98,7 +100,7 @@ def homepage():
 
 
 @app.route("/login", methods=['GET', 'POST'])
-@add_to_navbar("Login", lambda: not current_user.is_authenticated)
+@add_to_navbar("Login", condition=lambda: not current_user.is_authenticated, side="right")
 def login():
     """Used to login a user"""
     # Returns a login form when the user navigates to the page
@@ -136,7 +138,7 @@ def login():
 
 
 @app.route('/logout')
-@add_to_navbar("Logout", lambda: current_user.is_authenticated)
+@add_to_navbar("Logout", condition=lambda: current_user.is_authenticated, side="right")
 def logout():
     """Used to log out a user"""
     # Logs out the current user
@@ -146,7 +148,7 @@ def logout():
 
 
 @app.route('/signup', methods=['GET', 'POST'])
-@add_to_navbar("Sign Up", lambda: not current_user.is_authenticated)
+@add_to_navbar("Sign Up", condition=lambda: not current_user.is_authenticated, side="right")
 def signup():
     """Used for creating a user account"""
     # Returns a sign up form when the user navigates to the page
@@ -192,7 +194,7 @@ def signup():
 
 
 @app.route('/open_account', methods=['GET', 'POST'])
-@add_to_navbar("Open an Account", lambda: current_user.is_authenticated)
+@add_to_navbar("Open an Account", condition=lambda: current_user.is_authenticated)
 def open_account():
     """Used to open a bank account for the current user"""
     # Returns an account selection form when the user navigates to the page
@@ -258,7 +260,7 @@ def open_account():
 
 
 @app.route('/make_transaction', methods=['GET', 'POST'])
-@add_to_navbar("Make Transaction", lambda: current_user.is_authenticated)
+@add_to_navbar("Make Transaction", condition=lambda: current_user.is_authenticated)
 def make_transaction():
     """Used to make a transaction"""
     # Returns a transaction form when the user navigates to the page
@@ -321,7 +323,7 @@ def make_transaction():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-@add_to_navbar("Admin", lambda: current_user.is_authenticated and current_user.id == "admin")
+@add_to_navbar("Admin", condition=lambda: current_user.is_authenticated and current_user.id == "admin")
 def admin():
     """Allows admins to adjust users' credit scores"""
     # Returns a credit score form when the user navigates to the page
@@ -406,7 +408,7 @@ def get_accounts(username: str) -> List[Dict[str, str]]:
 
 
 @app.route('/dashboard')
-@add_to_navbar("Dashboard", lambda: current_user.is_authenticated)
+@add_to_navbar("Dashboard", condition=lambda: current_user.is_authenticated)
 def dashboard():
     """Allows the user to view their accounts"""
     # Retrieves the current user's username from the session and gets their accounts

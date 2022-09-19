@@ -31,7 +31,14 @@
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
                         {% for name, page in navbar_page_names.items() -%}
-                        {%- if page["condition"]() -%}
+                        {%- if page["condition"]() and page["side"] == "left" -%}
+                        <a class="nav-link{%- if request.path == url_for(page['view'].__name__) %} active{% endif %}" href="{{ url_for(page['view'].__name__) }}">{{ name }}</a>
+                        {% endif %}
+                        {%- endfor -%}
+                    </div>
+                    <div class="navbar-nav ms-auto">
+                        {% for name, page in navbar_page_names.items() -%}
+                        {%- if page["condition"]() and page["side"] == "right" -%}
                         <a class="nav-link{%- if request.path == url_for(page['view'].__name__) %} active{% endif %}" href="{{ url_for(page['view'].__name__) }}">{{ name }}</a>
                         {% endif %}
                         {%- endfor -%}
