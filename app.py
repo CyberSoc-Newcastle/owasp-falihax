@@ -149,14 +149,7 @@ def signup():
     """Used for creating a user account"""
     # Returns a sign up form when the user navigates to the page
     if request.method == 'GET':
-        return '''
-                   <form method='POST'>
-                   <input type='text' name='fullname' id='fullname' placeholder='full name'/>
-                    <input type='text' name='username' id='username' placeholder='username'/>
-                    <input type='password' name='password' id='password' placeholder='password'/>
-                    <input type='submit' name='submit'/>
-                   </form>
-                   '''
+        return render_template("signup.html")
 
     # Retrieves the username from the form
     username = request.form['username']
@@ -171,7 +164,8 @@ def signup():
 
     # If a row is retrieved then the username is already taken
     if row is not None:
-        return "An account with this username already exists"
+        flash('An account with this username already exists. Please try again.', 'warning')
+        return render_template("signup.html")
 
     # Retrieves the password and name from the form
     password = request.form['password']
@@ -187,6 +181,7 @@ def signup():
     connection.commit()
     connection.close()
     # Redirects to login page
+    flash('Sign up successful!', 'success')
     return redirect(url_for('login'))
 
 
