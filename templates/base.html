@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
     <head>
         <meta charset="UTF-8">
         <title>
@@ -18,7 +18,7 @@
         <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 
     </head>
-    <body>
+    <body class="d-flex flex-column h-100">
         <nav class="navbar navbar-expand-lg navbar-light" style="background-color:#fcc">
             <div class="container">
                 <a class="navbar-brand" href="{{ url_for('homepage') }}">
@@ -39,7 +39,7 @@
                 </div>
             </div>
         </nav>
-        <main>
+        <main class="flex-shrink-0">
             {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
             <div class="container flashes">
