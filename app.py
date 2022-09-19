@@ -322,7 +322,7 @@ def make_transaction():
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-@add_to_navbar("Admin")
+@add_to_navbar("Admin", lambda: current_user.id == "admin")
 def admin():
     """Allows admins to adjust users' credit scores"""
     # Returns a credit score form when the user navigates to the page
