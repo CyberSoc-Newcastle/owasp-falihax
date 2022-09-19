@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
+<div class="container mt-4">
+    <h1 class="display-5">Make a Transaction</h1>
     <div class="row">
         {%- if accounts -%}
         <script>
@@ -22,8 +23,8 @@
                 hidden_account_field.value = selected_account.dataset.account;
             }
         </script>
-        <form action='make_transaction' method='POST'>
-            <select id="from-accounts" class="form-select" onchange="update_from_account()">
+        <form action='make_transaction' method='POST' class="col-12 col-lg-5">
+            <select id="from-accounts" class="form-select my-3" onchange="update_from_account()">
                 <option selected disabled>Choose an account to send money from...</option>
                 {%- for account in accounts -%}
                 <option data-sort="{{ account['sort'] }}" data-account="{{ account['account'] }}">
@@ -31,15 +32,15 @@
                 </option>
                 {%- endfor -%}
             </select>
-            <input type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
-            <input type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
+            <input class="form-control mb-3" type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
+            <input class="form-control mb-3" type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
             <input type='hidden' name='fromsortcode' id='fromsortcode'/>
             <input type='hidden' name='fromaccountnumber' id='fromaccountnumber'/>
-            <div class="input-group">
+            <div class="input-group mb-3">
                 <span class="input-group-text">£</span>
                 <input class="form-control" type='number' name='amount' id='amount' min="0.01" step=".01" value="0.01"/>
             </div>
-            <input type='submit' name='submit'/>
+            <input class="btn btn-danger mb-3" type='submit' name='submit'/>
         </form>
         {%- else -%}
         <p>Please open a bank account first.</p>
