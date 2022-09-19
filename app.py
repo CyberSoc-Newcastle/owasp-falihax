@@ -141,7 +141,8 @@ def logout():
     """Used to log out a user"""
     # Logs out the current user
     flask_login.logout_user()
-    return 'Logged out'
+    flash('Goodbye!', 'primary')
+    return redirect(url_for('homepage'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
