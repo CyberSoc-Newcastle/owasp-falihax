@@ -105,13 +105,7 @@ def login():
     """Used to login a user"""
     # Returns a login form when the user navigates to the page
     if request.method == 'GET':
-        return '''
-                   <form method='POST'>
-                    <input type='text' name='username' id='username' placeholder='username'/>
-                    <input type='password' name='password' id='password' placeholder='password'/>
-                    <input type='submit' name='submit'/>
-                   </form>
-                   '''
+        return render_template("login.html")
 
     # Retrieves the username from the form
     username = request.form['username']
@@ -134,7 +128,8 @@ def login():
         return redirect(url_for('homepage'))
 
     # Returns a failure message if the details are incorrect
-    return 'Login failed'
+    flash('Login failed.', 'danger')
+    return render_template("login.html")
 
 
 @app.route('/logout')
