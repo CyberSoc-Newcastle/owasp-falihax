@@ -264,23 +264,15 @@ def make_transaction():
     """Used to make a transaction"""
     # Returns a transaction form when the user navigates to the page
     if request.method == 'GET':
-        return '''
-                   <form method='POST'>
-                   <input type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
-                    <input type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
-                    <input type='text' name='fromsortcode' id='fromsortcode' placeholder='from sort code'/>
-                    <input type='text' name='fromaccountnumber' id='fromaccountnumber' placeholder='from account number'/>
-                    <input type='text' name='amount' id='amount' placeholder='amount'/>
-                    <input type='submit' name='submit'/>
-                   </form>
-                   '''
+        return render_template("make_transaction.html", accounts=get_accounts(flask_login.current_user.id))
 
     # Retrieves the infomation from the form
     sort = request.form['tosortcode']
     acc = request.form['toaccountnumber']
     usersort = request.form['fromsortcode']
     useracc = request.form['fromaccountnumber']
-    amount = int(request.form['amount'])
+    # convert the amount to pence
+    amount = int(float(request.form['amount'])*100)
 
     # Attempts to retrieve a bank account from the database which matches the 'to' details entered
     connection = sqlite3.connect("falihax.db")

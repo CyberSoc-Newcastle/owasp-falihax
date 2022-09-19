@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        {%- if accounts -%}
+        <script>
+            function update_from_account(){
+                /*
+                 *  We use a dropdown box to allow the user to select their account in a simple way,
+                 *  but the server needs to know its sort code and account number to process the transaction.
+                 *
+                 *  So we use this javascript code to update the hidden form fields with the sort code
+                 *  and account number when the user selects an account
+                 */
+                var dropdown = document.getElementById("from-accounts");
+                var selected_account = dropdown.options[dropdown.selectedIndex];
+
+                var hidden_sort_field = document.getElementById("fromsortcode");
+                var hidden_account_field = document.getElementById("fromaccountnumber");
+
+                hidden_sort_field.value = selected_account.dataset.sort;
+                hidden_account_field.value = selected_account.dataset.account;
+            }
+        </script>
+        <form action='make_transaction' method='POST'>
+            <select id="from-accounts" class="form-select" onchange="update_from_account()">
+                <option selected disabled>Choose an account to send money from...</option>
+                {%- for account in accounts -%}
+                <option data-sort="{{ account['sort'] }}" data-account="{{ account['account'] }}">
+                    [{{ account['sort'] }}/{{ account['account'] }}] {{ account['name'] }} ({{ account['balance'] }})
+                </option>
+                {%- endfor -%}
+            </select>
+            <input type='text' name='tosortcode' id='tosortcode' placeholder='to sort code'/>
+            <input type='text' name='toaccountnumber' id='toaccountnumber' placeholder='to account number'/>
+            <input type='hidden' name='fromsortcode' id='fromsortcode'/>
+            <input type='hidden' name='fromaccountnumber' id='fromaccountnumber'/>
+            <div class="input-group">
+                <span class="input-group-text">£</span>
+                <input class="form-control" type='number' name='amount' id='amount' min="0.01" step=".01" value="0.01"/>
+            </div>
+            <input type='submit' name='submit'/>
+        </form>
+        {%- else -%}
+        <p>Please open a bank account first.</p>
+        {%- endif -%}
+    </div>
+</div>
+{% endblock %}
