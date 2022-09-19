@@ -265,7 +265,7 @@ def make_transaction():
     usersort = request.form['fromsortcode']
     useracc = request.form['fromaccountnumber']
     # convert the amount to pence
-    amount = int(float(request.form['amount'])*100)
+    amount = int(float(request.form['amount']) * 100)
 
     # Attempts to retrieve a bank account from the database which matches the 'to' details entered
     connection = sqlite3.connect("falihax.db")
@@ -403,8 +403,16 @@ def get_accounts(username: str) -> List[Dict[str, str]]:
 @add_to_navbar("Dashboard", condition=lambda: current_user.is_authenticated)
 def dashboard():
     """Allows the user to view their accounts"""
+    username = flask_login.current_user.id
+    # get the users credit score
+    connection = sqlite3.connect("falihax.db")
+    connection.row_factory = sqlite3.Row
+    cursor = connection.cursor()
+    credit_score = int(
+        cursor.execute("select credit_score from users where username = \"" + username + "\"").fetchone()[0])
+    connection.close()
     # Retrieves the current user's username from the session and gets their accounts
-    return render_template("dashboard.html", accounts=get_accounts(flask_login.current_user.id))
+    return render_template("dashboard.html", accounts=get_accounts(flask_login.current_user.id), credit_score=credit_score)
 
 
 @app.route('/account/<sort_code>/<account_number>')
@@ -424,10 +432,10 @@ def account(sort_code: str, account_number: str):
     rows = cursor.fetchall()
     cursor.execute(
         f"SELECT"
-f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE to_sort_code == '{sort_code}' AND to_account_number == '{account_number}')"
-f"-"
-    f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE from_sort_code == '{sort_code}' AND from_account_number == '{account_number}')"
-    f"AS total;"
+        f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE to_sort_code == '{sort_code}' AND to_account_number == '{account_number}')"
+        f"-"
+        f"(SELECT COALESCE(SUM(amount), 0) FROM transactions WHERE from_sort_code == '{sort_code}' AND from_account_number == '{account_number}')"
+        f"AS total;"
     )
     balance = amount_format(cursor.fetchone()[0])
     connection.close()
