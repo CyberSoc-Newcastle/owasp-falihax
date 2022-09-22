@@ -16,6 +16,22 @@ their security!
 
 **percentage expressed in binary. 4% margin of error.*
 
+## Task
+Download or fork this repository, and try to find as many security vulnerabilites
+as possible and fix them!
+
+## Competition
+
+[Click here](https://forms.office.com/r/hza2ZDWt02) to submit your entry when
+you have finished, to enter the competition! Competition rules and prizes are
+displayed on the form.
+
+## Need help?
+Just ask us as we move around the room, or alternatively you can ask on our
+cyber help channel on our [Discord server](https://cybersoc.org.uk/discord).
+To access it, just join and message us to say you're in the hackathon, and you
+will be given access to the cyber help and resources channels!
+
 *All companies, content and people portrayed in this work
 are fictitious or parodic in nature. No association with actual people or
 companies is intended or should be inferred.*
