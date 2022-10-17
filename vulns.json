@@ -1,0 +1,375 @@
+{
+  "repo": "CyberSoc-Newcastle/owasp-falihax",
+  "categories": [
+    {
+      "name": "Broken Access Control",
+      "owasp-id": "A01",
+      "link": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/",
+      "description": "Access control enforces policy such that users cannot act outside of their intended permissions. Failures typically lead to unauthorized information disclosure, modification, or destruction of all data or performing a business function outside the user's limits.",
+      "instances": [
+        {
+          "name": "Unauthorised users are allowed to visit secure pages",
+          "description": "The `@add_to_navbar` decorator function is used to perform basic checks and not show logged in user only pages to anonymous users. However, slightly deceptively, this doesn't actually prevent a user who isn't signed in from accessing these pages!",
+          "examples": [],
+          "solution": {
+            "description": "You should throw an error if the user tries to access a page they're not supposed to. This could be a 403 forbidden HTTP response. Flask-Login has the `@login_required` decorator which can be added to view functions to handle this for you.",
+            "link": "https://flask-login.readthedocs.io/en/latest/#protecting-views"
+          }
+        },
+        {
+          "name": "No access control/owner check on account page",
+          "description": "The account/transactions page does not perform any check that the user actually owns the account specified in the URL. This means that anyone can enter a sort code and account number and see the transaction history, or even worse use a script to enumerate all bank accounts on the system.",
+          "examples": [],
+          "solution": {
+            "description": "In the account page view, verify that the account belongs to the currently logged in user before returning any account details. Throw some error such as HTTP 403 Forbidden if it does not."
+          }
+        },
+        {
+          "name": "No access control on the admin page",
+          "xkcd": 1200,
+          "description": "While it does not show in the navbar unless your username is admin, the admin page is accessible by any user. This page allows anyone to change a customer's credit score, which shouldn't be public!",
+          "examples": [],
+          "solution": {
+            "description": "In the admin page view, verify that the user is an admin in some way before returning the page. The exact way you do this is up to you, although we tried to suggest you just take the naive approach of checking if the username is admin. Throw some error such as HTTP 403 Forbidden otherwise."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cryptographic Failures",
+      "owasp-id": "A02",
+      "link": "https://owasp.org/Top10/A02_2021-Cryptographic_Failures/",
+      "description": "Cryptography is used to secure communications or data at rest against adversarial behaviour. Cryptography failures can be caused by bad implementation, but also by bad choice of cipher algorithm in the first place.",
+      "instances": [
+        {
+          "name": "Unsuitable use of ROT-13 \"encryption\"",
+          "xkcd": 538,
+          "link": "https://en.wikipedia.org/wiki/ROT13",
+          "description": "ROT-13 is a simple substitution cipher. It doesn't make use of any key and the plaintext can be easily recovered, even by hand.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "122",
+                "178-180"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "While a better cipher could have been used, the proper solution is to use a robust hashing algorithm (such as bcrypt) to transform the passwords before storing instead. Hashing is a one way operation designed to make it easy to compare two passwords together, without being able to derive the plaintext from the stored hash itself. Best practice is to also use a salt - a unique piece of data (stored alongside the hash), added to the plaintext before hashing to prevent comparing passwords against pre-computed (or leaked) hashes, in so-called \"rainbow table\" attacks.",
+            "link": "https://www.youtube.com/watch?v=yoMOAIzBSpY"
+          }
+        },
+        {
+          "name": "Random number generation is not secure",
+          "xkcd": 2626,
+          "link": "https://en.wikipedia.org/wiki/Random_number_generation#%22True%22_vs._pseudo-random_numbers",
+          "description": "A random number generator is used to generate bank account numbers. However, this uses a PRNG, which generates a reproducible series of numbers given some initial starting value (seed). Therefore, an adversary could find this seed and enumerate all bank account numbers.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "7",
+                "211-218"
+              ]
+            }
+          ],
+          "solution": {
+            "xkcd": 221,
+            "description": "Use a cryptographically secure random number generator, such as Python's 'secrets' library.",
+            "link": "https://docs.python.org/3/library/secrets.html"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Injection",
+      "owasp-id": "A03",
+      "link": "https://owasp.org/Top10/A03_2021-Injection/",
+      "description": "Code injection is caused by untrusted, unsanitized input being processed as exectuable code. This should be prevented by sanitizing input, thereby removing any characters which could cause the machine to begin processing the input as code.",
+      "instances": [
+        {
+          "name": "SQL Injection",
+          "xkcd": 327,
+          "link": "https://www.w3schools.com/sql/sql_injection.asp",
+          "description": "The web app did not sanitise input before adding into SQL statements. This means maliciously crafted input from an attacker could be treated as direct SQL code, which would be executed on the database.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "28",
+                "46",
+                "117",
+                "161",
+                "179-180",
+                "227-228",
+                "244-245",
+                "274-275",
+                "292-293",
+                "306-308",
+                "333",
+                "346",
+                "364-365",
+                "383-389",
+                "412",
+                "429-431",
+                "433-439"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "Input needs to be sanitised in some way before being inserted into an SQL statement. While there are many ways to do this, one of the simplest is to use parameterised statements. This involves adding \"placeholders\" to your SQL statements, which your SQL library will then fill with your input data (which it automatically sanitises). Other methods such as using an ORM (like SQLAlchemy) use this method internally.",
+            "link": "https://docs.python.org/3/library/sqlite3.html#sqlite3-placeholders"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Insecure Design",
+      "owasp-id": "A04",
+      "link": "https://owasp.org/Top10/A04_2021-Insecure_Design/",
+      "description": "While most security failures can be put down to implementation error (typically a mistake made when writing code), some failures are so fundamental that they were made during the design of the system, and cannot be fixed by good code.",
+      "instances": [
+        {
+          "name": "No CAPTCHAs Used",
+          "xkcd": 1897,
+          "link": "https://en.wikipedia.org/wiki/CAPTCHA",
+          "description": "The web app doesn't use CAPTCHAs to prevent bots from signing in, completing transactions or registering new accounts. CAPTCHAs require some form of evidence from the user that they are human, and prevent bots from completing actions that may be harmful to the business if automated or done en masse. This could be done to achieve denial of service, or simply using user credentials from database leaks to steal information or money.",
+          "examples": [],
+          "solution": {
+            "description": "Use a CAPTCHA service, such as reCAPTCHA, on any form actions that could cause harm if done by a bot or en masse.",
+            "link": "https://python.plainenglish.io/how-to-use-google-recaptcha-with-flask-dbd79d5ea193"
+          }
+        },
+        {
+          "name": "No Password Strength Checks",
+          "xkcd": 936,
+          "link": "https://en.wikipedia.org/wiki/Password_strength",
+          "description": "There are no password strength checks in the web app. Passwords need to be sufficiently complex (have enough bits of **entropy**) in order to resist brute-force attacks to some satisfactory level. There was no such protection in the web app, meaning the user would be permitted to choose a weak password that could be easily guessed.",
+          "examples": [],
+          "solution": {
+            "description": "Check passwords match some minimum complexity requirement and reject them if they do not. You could also look the password up in a dictionary of common passwords, or even better a list of leaked passwords although this could freak the user out a little! If you decided to hash the password on client side and then again on the server side for whatever reason, you would need to perform this validation on the client side. However this is probably okay, since if someone crafted malicious requests to bypass the check they would only be purposely harming themselves - it depends on what your threat model could be.",
+            "link": "https://www.section.io/engineering-education/password-strength-checker-javascript/"
+          }
+        },
+        {
+          "name": "No Rate Limiting",
+          "link": "https://en.wikipedia.org/wiki/Rate_limiting",
+          "description": "Rate limiting is used to prevent brute forcing or resources being depleted by unusually high traffic volumes. Without rate limiting, bots can brute force passwords by trying hundreds per second, or cause denial of service by purposely depleting server bandwidth or API quotas.\n\nLimiting a user account to a certain number of password attempts before requiring additional verification is a form of rate limiting.",
+          "examples": [],
+          "solution": {
+            "description": "Use a rate limiter in the web app (and possibly an external rate limiter/protection service like Cloudflare).",
+            "link": "https://www.section.io/engineering-education/implementing-rate-limiting-in-flask/"
+          }
+        },
+        {
+          "name": "Vulnerable to MITM attack",
+          "link": "https://en.wikipedia.org/wiki/Man-in-the-middle_attack",
+          "description": "A machine-in-the-middle/man-in-the-middle attacks is when an adversary is able to silently intercept and relay communications between a client and a server, either passively listening in or actively altering data in transit. In the case of the web app, SSL/TLS (often refered to as part of HTTPS) is not used to encrypt web traffic. This means that an attacker could sniff the connection to retrieve things like passwords which are sent in plaintext.",
+          "examples": [],
+          "solution": {
+            "description": "Use SSL on the web app, although this is difficult to achieve in the hackathon environment. You could also additionally hash the passwords on the client side before sending them and hashing again on the server, but this only gives slight protection from an attacker listening in being able to retrieve the plaintext password. If the attacker can get the client hash they would still be able to authenticate with that in the form of a replay attack. See the link for more information.",
+            "link": "https://stackoverflow.com/questions/3715920/is-it-worth-hashing-passwords-on-the-client-side"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Misconfiguration",
+      "owasp-id": "A05",
+      "link": "https://owasp.org/Top10/A05_2021-Security_Misconfiguration/",
+      "description": "Security misconfigurations include things like default passwords being set and unnecessary features being left accidentally enabled.",
+      "instances": [
+        {
+          "name": "Flask secret key used is not secure",
+          "link": "https://stackoverflow.com/questions/22463939/demystify-flask-app-secret-key",
+          "description": "Flask requires a secret key to be specified in the web app, which is used for cryptographic purposes. The provided default key is easy to guess or brute force, negating any security built into flask's cookie system.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "12"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "This key should be a long and securely random string, preferably stored in a secrets file as opposed to raw in the source code itself.",
+            "link": "https://stackoverflow.com/questions/34902378/where-do-i-get-secret-key-for-flask"
+          }
+        },
+        {
+          "name": "Flask debug mode is left enabled",
+          "link": "https://www.educba.com/flask-debug-mode/",
+          "description": "Flask has a built in debug mode which, when enabled for your web app, allows you to get full error messages and tracebacks in your browser if your code throws an exception. It also gives you access to a Python console to run arbitary code in the context of the web app view. This is great for debugging, but is a huge security vulnerability as it allows remote code execution, along with revealing sensitive error information to users.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "472-473"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "Disable debug mode when you call app.run().",
+            "link": "https://arrayoverflow.com/question/how-to-turn-off-debug-mode-in-flask-app/606"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vulnerable and Outdated Components",
+      "owasp-id": "A06",
+      "link": "https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/",
+      "description": "Outdated components have the potential to introduce security vulnerabilities to a system. When a vulnerability is publicly found in a component, it will typically be patched by the vendor via an update and so promptly updating components is critical.",
+      "instances": []
+    },
+    {
+      "name": "Identification and Authentication Failures",
+      "owasp-id": "A07",
+      "link": "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/",
+      "description": "Whereas access control failures arise from allowing a known user access to something they shouldn't be able to, identification and authentication failures arise from mis-identifying the user in the first place.",
+      "instances": [
+        {
+          "name": "No multi-factor authentication available",
+          "xkcd": 2522,
+          "link": "https://en.wikipedia.org/wiki/Multi-factor_authentication",
+          "description": "The web app doesn't allow users to set up any kind of multi-factor authentication, such as a one-time password generated by an authenticator app. Such login \"factors\" (as they are known) can improve security by making it more difficult for adversaries to gain access to accounts if they only have one factor, such as a leaked password.",
+          "examples": [],
+          "solution": {
+            "xkcd": 2543,
+            "description": "Use a library like `pyotp` to generate authenticator keys and validate a token generated by the user's authenticator app.",
+            "link": "https://www.section.io/engineering-education/implementing-totp-2fa-using-flask/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Software and Data Integrity Failures",
+      "owasp-id": "A08",
+      "link": "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/",
+      "description": "Data integrity failures arise when data is erroneously trusted or it's integrity falsely assumed. A user could exploit the web app by modifying unsigned data that the server trusts in a web request.",
+      "instances": [
+        {
+          "name": "Missing Validation for Lower Bound of Transaction Amount",
+          "description": "There is no validation on the transaction amount given to ensure it is greater than 0. Therefore, a user could enter a negative transaction amount which would take money from the recipients account, effectively running the transaction backwards without permission, stealing money.",
+          "examples": [],
+          "solution": {
+            "description": "The input field on the web page should have a minimum value specified so the user cannot enter negative values, and the server should also validate this to ensure the client has not bypassed the field parameters by crafting a malicious request."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Security Logging and Monitoring Failures",
+      "owasp-id": "A09",
+      "link": "https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/",
+      "description": "If you don't know that something has gone wrong, you don't know that you need to fix it. Logging and monitoring (or \"visibility\", as it's often called) is important in keeping a system safe.",
+      "instances": [
+        {
+          "name": "No Logging",
+          "link": "https://en.wikipedia.org/wiki/Logging_(software)",
+          "description": "The web app does not keep logs for anything, including security critical events.",
+          "examples": [],
+          "solution": {
+            "description": "Use a logging library to keep logs. This could be just for security critical events (like incorrect logins), or it could include information level events like transactions where a \"paper trail\" could be useful to the business.",
+            "link": "https://flask.palletsprojects.com/en/2.2.x/logging/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Server Side Request Forgery",
+      "owasp-id": "A10",
+      "link": "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/",
+      "description": "Server Side Request Forgery causes the web server to make outgoing web requests to arbitary addresses specified by the user, which could be malicious.",
+      "instances": []
+    },
+    {
+      "name": "Miscellaneous",
+      "description": "Other security issues or vulnerabilities that don't precisely fit within any OWASP Top 10 category.",
+      "instances": [
+        {
+          "name": "Sort code generation denial of service vulnerability",
+          "description": "When creating a new account, the web app mistakenly enforces both the sort code and account number to be unique separately, whereas it should only require the combination of them to be unique. This means that rather than the system being able to handle 100 trillion different accounts it can instead only handle 10 thousand before it runs out of unique sort codes. Especially with no rate limiting, it would be trivial to create this many accounts and cause a denial of service as the web app would get stuck in an inifinte loop every time someone tries to open a new account.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "207-234"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "Change the logic operator in the SQL statement from OR to AND, i.e., `sort_code = sort and account_number = acc`. This means the code will only mark a combination as already taken when an account exists with BOTH identifiers the same, rather than just one.\n\nWhile this proper implementation is still hypothetically vulnerable to the denial of service issue, it would require 10 orders of magnitude more accounts to be created making this specific attack impractical - something else would probably fail first, such as the database disk becoming full."
+          }
+        },
+        {
+          "name": "Secrets shouldn't be stored in code",
+          "link": "https://en.wikipedia.org/wiki/Configuration_file",
+          "description": "Secrets are generally private keys or tokens used for cryptographic purposes within a web app, or to authenticate with some external service like an API. The web app stores the flask secret key in the code, which is insecure as anyone with access to read the code (which could be everyone in an open source project) would be able to sign cookies as though they were the server.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "12"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "Use some form of secrets storage or management tool, such as a configuration file. You can keep the configuration file out of your code repository and distribute it separately through some pre-existing, secure channel.",
+            "link": "https://medium.com/black-tech-diva/hide-your-api-keys-7635e181a06c"
+          }
+        },
+        {
+          "name": "Cross-site request forgery (CSRF)",
+          "link": "https://en.wikipedia.org/wiki/Cross-site_request_forgery",
+          "description": "Cross-site request forgery refers to a third-party web page forging requests to some other web page, often taking advantage of things like the user being logged in on the site to perform unauthorised privileged actions. For example, the page to perform a transaction simply takes account details and an amount - there is nothing stopping an external website (while being used in the users browser) from making a fraudulent request to the web app and making a transaction without permission.",
+          "examples": [],
+          "solution": {
+            "description": "Send a CSRF token to the client with each page that includes a form. Validate the token on the server when the form is submitted and reject any submissions without a valid token. The `flask-wtf` library has built in CSRF functionality you can use.",
+            "link": "https://testdriven.io/blog/csrf-flask/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Non-security Critical Issues",
+      "maximum_mark": 1,
+      "description": "Issues or potential improvements that are not security critical, but bonus marks were awarded for fixing them anyway.",
+      "instances": [
+        {
+          "name": "Bad or No Input Validation (General Cases)",
+          "description": "There is generally no validation performed on input. While this can lead to general errors, bad user experience and even security vulnerabilities such as injection or data integrity failures, in itself it is not always security critical.",
+          "examples": [],
+          "solution": {
+            "description": "Input validation will be different in each case, but in general works by declaring a series of constraints that input must meet to be accepted. \n\nCommon contraints include:\n- Data must be of a certain type (i.e., numeric/integer/float/string/file)\n- Data must be within a certain range (i.e., minimum and maximum for numeric data)\n- Data must not exceed a specified length\n\nInput can either be transformed (i.e, numeric string converted to an integer) or more often rejected if it does not meet the validation constraints. Best practice is to validate on **both** the client and server side - client side validation makes it easier to present error information in the UI and reduces load on the server, whereas server side validation reliably prevents the invalid input from reaching business logic. Remember - you cannot trust the client side!",
+            "link": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+          }
+        },
+        {
+          "name": "Admin permissions are assigned based on a fixed username instead of role",
+          "description": "The limited admin permissions that exist are (at least supposed to be) assigned based on if the user's username is `admin`. This isn't a great solution, because what if there are multiple admin users? What if you forget to register the username admin, and someone else registers it first? What if your code forgets to apply the unique usernames constraint, and multiple people take the username `admin`? This isn't the best approach.",
+          "examples": [
+            {
+              "file": "app.py",
+              "at_commit": "8afa29f877dca468be95bc2ef8e0bda6ce625586",
+              "lines": [
+                "318"
+              ]
+            }
+          ],
+          "solution": {
+            "description": "One approach to take would be to create an admin \"role\" which can be assigned to users at will. This could take the form of an additional boolean database column to mark an account as an admin or not, among other ways."
+          }
+        }
+      ]
+    }
+  ]
+}

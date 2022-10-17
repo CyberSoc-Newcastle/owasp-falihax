@@ -2,6 +2,8 @@
 
 # Falihax OWASP Hackathon
 
+[**Full vulnerability and solution list now released!**](VULNS.md)
+
 ## Premise
 Falihax is a brand new, 100%* real and secure banking company. Last year, they
 contracted a group of computer science students to build a website for them -
